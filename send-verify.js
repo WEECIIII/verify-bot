@@ -3,7 +3,7 @@
 // Example: node send-verify.js 1234567890123456789
 
 const CHANNEL_ID = process.argv[2];
-const BOT_TOKEN  = 'MTUwNzAyODA1MTQyOTY5MTYyNA.Gfwug6.ppZcEDvmMWYImYO2oZZdpW7aKZoVZmonJ95K1c';
+const BOT_TOKEN  = process.env.DISCORD_TOKEN;
 
 if (!CHANNEL_ID) {
   console.error('❌ Usage: node send-verify.js <CHANNEL_ID>');

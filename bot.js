@@ -12,7 +12,7 @@ const {
 } = require('discord.js');
 
 // ── Config ────────────────────────────────
-const BOT_TOKEN     = 'MTUwNzAyODA1MTQyOTY5MTYyNA.Gfwug6.ppZcEDvmMWYImYO2oZZdpW7aKZoVZmonJ95K1c';
+const BOT_TOKEN     = process.env.DISCORD_TOKEN;
 const CLIENT_ID     = '1507028051429691624';
 const GUILD_ID      = '1504579285103677651';
 const MEMBER_ROLE_ID = '1504793152131829850';
