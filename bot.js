@@ -79,6 +79,12 @@ async function registerCommands() {
         opt.setName('user').setDescription('User to remove').setRequired(true)
       )
       .toJSON(),
+
+    new SlashCommandBuilder()
+      .setName('testwelcome')
+      .setDescription('Test the welcome system — simulates you joining the server')
+      .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+      .toJSON(),
   ];
 
   const rest = new REST({ version: '10' }).setToken(BOT_TOKEN);
@@ -238,6 +244,90 @@ client.on('interactionCreate', async (interaction) => {
 
       await interaction.channel.send({ embeds: [embed], components: [row] });
       await interaction.reply({ content: '✅ Ticket panel sent!', ephemeral: true });
+    }
+
+    // ── /testwelcome ────────────────────────────────────
+    if (interaction.commandName === 'testwelcome') {
+      if (!interaction.memberPermissions.has(PermissionFlagsBits.Administrator)) {
+        return interaction.reply({ content: '❌ You need Administrator permission.', ephemeral: true });
+      }
+
+      await interaction.deferReply({ ephemeral: true });
+
+      const member     = interaction.member;
+      const guild      = interaction.guild;
+      const avatarUrl  = member.user.displayAvatarURL({ dynamic: true, size: 256 });
+      const memberCount = guild.memberCount;
+
+      let channelOk = false;
+      let dmOk      = false;
+
+      // ── Send to welcome channel ────────────────────────
+      try {
+        const welcomeChannel = guild.channels.cache.get(WELCOME_CHANNEL_ID);
+        if (welcomeChannel) {
+          const embed = new EmbedBuilder()
+            .setColor(0x00b856)
+            .setAuthor({ name: `${member.user.username} just joined!`, iconURL: avatarUrl })
+            .setTitle('🎉  Welcome to Manifest Hub!')
+            .setDescription(
+              `Hey ${member}, glad to have you here!\n\n` +
+              '**To get started:**\n' +
+              '1️⃣ Head to <#1504793152131829850> and verify your account\n' +
+              '2️⃣ Visit **[manifesthubs.netlify.app](https://manifesthubs.netlify.app)** and log in\n' +
+              '3️⃣ Download manifests, Lua scripts and more!\n\n' +
+              '> Need help? Open a ticket in our support channel.'
+            )
+            .setThumbnail(avatarUrl)
+            .setImage('https://cdn.cloudflare.steamstatic.com/store/home/store_home_share.jpg')
+            .addFields(
+              { name: '👤 Member',  value: `${member}`,                                              inline: true },
+              { name: '🪪 Account', value: `<t:${Math.floor(member.user.createdTimestamp / 1000)}:D>`, inline: true },
+              { name: '👥 Members', value: `You are member **#${memberCount}**!`,                    inline: true },
+            )
+            .setFooter({ text: '🧪 TEST — Manifest Hub • Steam Manifest Downloader' })
+            .setTimestamp();
+
+          await welcomeChannel.send({ content: `Welcome ${member} 🎉`, embeds: [embed] });
+          channelOk = true;
+        }
+      } catch (err) {
+        console.error('❌ /testwelcome channel send failed:', err.message);
+      }
+
+      // ── Send DM ────────────────────────────────────────
+      try {
+        const dmEmbed = new EmbedBuilder()
+          .setColor(0x5865f2)
+          .setTitle('👋  Welcome to Manifest Hub!')
+          .setDescription(
+            `Hey **${member.user.username}**, thanks for joining **Manifest Hub**!\n\n` +
+            '**Here\'s how to get started:**\n' +
+            '1️⃣ Visit our website below and log in with Discord\n' +
+            '2️⃣ You\'ll get verified automatically ✅\n' +
+            '3️⃣ Download Steam manifests, Lua scripts and more!\n\n' +
+            '> 🔒 Need help? Open a support ticket in the server.'
+          )
+          .addFields(
+            { name: '🌐 Website', value: '[manifesthubs.netlify.app](https://manifesthubs.netlify.app)', inline: true },
+            { name: '💬 Discord', value: '[Join here](https://discord.gg/KUDhw8zYh)',               inline: true },
+          )
+          .setThumbnail(guild.iconURL({ dynamic: true }))
+          .setFooter({ text: '🧪 TEST — Manifest Hub • Automated Welcome Message' })
+          .setTimestamp();
+
+        await member.send({ embeds: [dmEmbed] });
+        dmOk = true;
+      } catch (err) {
+        console.warn(`⚠️ /testwelcome DM failed: ${err.message}`);
+      }
+
+      await interaction.editReply({
+        content:
+          `🧪 **Welcome test complete!**\n` +
+          `📢 Channel message: ${channelOk ? '✅ Sent to <#' + WELCOME_CHANNEL_ID + '>' : '❌ Failed'}\n` +
+          `📨 DM: ${dmOk ? '✅ Sent to your DMs' : '❌ Failed (DMs may be disabled)'}`,
+      });
     }
 
     // ── /close ──────────────────────────────────────────
