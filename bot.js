@@ -28,6 +28,9 @@ const TICKET_CATEGORY_ID  = process.env.TICKET_CATEGORY_ID  || '1507332056642879
 const SUPPORT_ROLE_ID     = process.env.SUPPORT_ROLE_ID     || '1507332152465821706';
 const TICKET_LOG_CHANNEL  = process.env.TICKET_LOG_CHANNEL  || '1507332505458573403';
 
+// ── Welcome System Config ─────────────────
+const WELCOME_CHANNEL_ID  = process.env.WELCOME_CHANNEL_ID  || '1504579285694943495';
+
 // ── In-memory set to prevent duplicate open tickets ───────
 // Maps userId → ticketChannelId
 const openTickets = new Map();
@@ -91,6 +94,77 @@ async function registerCommands() {
 client.once('ready', async () => {
   console.log(`✅ Manifest Helper Bot logged in as ${client.user.tag}`);
   await registerCommands();
+});
+
+// ══════════════════════════════════════════════════════════
+//  WELCOME SYSTEM
+// ══════════════════════════════════════════════════════════
+client.on('guildMemberAdd', async (member) => {
+  const guild = member.guild;
+
+  // ── Welcome embed in hub channel ────────
+  try {
+    const welcomeChannel = guild.channels.cache.get(WELCOME_CHANNEL_ID);
+    if (welcomeChannel) {
+      const avatarUrl = member.user.displayAvatarURL({ dynamic: true, size: 256 });
+      const memberCount = guild.memberCount;
+
+      const embed = new EmbedBuilder()
+        .setColor(0x00b856)
+        .setAuthor({ name: `${member.user.username} just joined!`, iconURL: avatarUrl })
+        .setTitle('🎉  Welcome to Manifest Hub!')
+        .setDescription(
+          `Hey ${member}, glad to have you here!\n\n` +
+          '**To get started:**\n' +
+          '1️⃣ Head to <#1504793152131829850> and verify your account\n' +
+          '2️⃣ Visit **[manifesthubs.netlify.app](https://manifesthubs.netlify.app)** and log in\n' +
+          '3️⃣ Download manifests, Lua scripts and more!\n\n' +
+          '> Need help? Open a ticket in our support channel.'
+        )
+        .setThumbnail(avatarUrl)
+        .setImage('https://cdn.cloudflare.steamstatic.com/store/home/store_home_share.jpg')
+        .addFields(
+          { name: '👤 Member', value: `${member}`, inline: true },
+          { name: '🪪 Account', value: `<t:${Math.floor(member.user.createdTimestamp / 1000)}:D>`, inline: true },
+          { name: '👥 Members', value: `You are member **#${memberCount}**!`, inline: true },
+        )
+        .setFooter({ text: 'Manifest Hub • Steam Manifest Downloader' })
+        .setTimestamp();
+
+      await welcomeChannel.send({ content: `Welcome ${member} 🎉`, embeds: [embed] });
+      console.log(`👋 Welcome message sent for ${member.user.tag}`);
+    }
+  } catch (err) {
+    console.error('❌ Failed to send welcome message:', err.message);
+  }
+
+  // ── DM the new member ───────────────────
+  try {
+    const dmEmbed = new EmbedBuilder()
+      .setColor(0x5865f2)
+      .setTitle('👋  Welcome to Manifest Hub!')
+      .setDescription(
+        `Hey **${member.user.username}**, thanks for joining **Manifest Hub**!\n\n` +
+        '**Here\'s how to get started:**\n' +
+        '1️⃣ Visit our website below and log in with Discord\n' +
+        '2️⃣ You\'ll get verified automatically ✅\n' +
+        '3️⃣ Download Steam manifests, Lua scripts and more!\n\n' +
+        '> 🔒 Need help? Open a support ticket in the server.'
+      )
+      .addFields(
+        { name: '🌐 Website', value: '[manifesthubs.netlify.app](https://manifesthubs.netlify.app)', inline: true },
+        { name: '💬 Discord', value: '[Join here](https://discord.gg/KUDhw8zYh)', inline: true },
+      )
+      .setThumbnail(guild.iconURL({ dynamic: true }))
+      .setFooter({ text: 'Manifest Hub • Automated Welcome Message' })
+      .setTimestamp();
+
+    await member.send({ embeds: [dmEmbed] });
+    console.log(`📨 DM sent to ${member.user.tag}`);
+  } catch (err) {
+    // User may have DMs disabled — that's fine
+    console.warn(`⚠️ Could not DM ${member.user.tag}: ${err.message}`);
+  }
 });
 
 // ══════════════════════════════════════════════════════════
