@@ -24,10 +24,9 @@ const MEMBER_ROLE_ID  = '1504793152131829850';
 // │  SUPPORT_ROLE_ID    : role that can see all tickets     │
 // │  TICKET_LOG_CHANNEL : channel to log closed tickets     │
 // └─────────────────────────────────────────────────────────┘
-// Category ID left empty — provide a valid Category channel ID to group tickets
-const TICKET_CATEGORY_ID  = process.env.TICKET_CATEGORY_ID  || '';
-const SUPPORT_ROLE_ID     = process.env.SUPPORT_ROLE_ID     || '1507332056642879538';
-const TICKET_LOG_CHANNEL  = process.env.TICKET_LOG_CHANNEL  || '1507332152465821706';
+const TICKET_CATEGORY_ID  = process.env.TICKET_CATEGORY_ID  || '1507332056642879538';
+const SUPPORT_ROLE_ID     = process.env.SUPPORT_ROLE_ID     || '1507332152465821706';
+const TICKET_LOG_CHANNEL  = process.env.TICKET_LOG_CHANNEL  || '1507332505458573403';
 
 // ── In-memory set to prevent duplicate open tickets ───────
 // Maps userId → ticketChannelId
