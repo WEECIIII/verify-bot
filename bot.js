@@ -165,7 +165,8 @@ client.on('guildMemberAdd', async (member) => {
       .setFooter({ text: 'Manifest Hub • Automated Welcome Message' })
       .setTimestamp();
 
-    await member.send({ embeds: [dmEmbed] });
+    const dmChannel = await member.user.createDM();
+    await dmChannel.send({ embeds: [dmEmbed] });
     console.log(`📨 DM sent to ${member.user.tag}`);
   } catch (err) {
     // User may have DMs disabled — that's fine
@@ -316,7 +317,8 @@ client.on('interactionCreate', async (interaction) => {
           .setFooter({ text: '🧪 TEST — Manifest Hub • Automated Welcome Message' })
           .setTimestamp();
 
-        await member.send({ embeds: [dmEmbed] });
+        const dmChannel = await interaction.user.createDM();
+        await dmChannel.send({ embeds: [dmEmbed] });
         dmOk = true;
       } catch (err) {
         console.warn(`⚠️ /testwelcome DM failed: ${err.message}`);
