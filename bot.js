@@ -121,14 +121,10 @@ client.on('guildMemberAdd', async (member) => {
         .setTitle('🎉  Welcome to Manifest Hub!')
         .setDescription(
           `Hey ${member}, glad to have you here!\n\n` +
-          '**To get started:**\n' +
-          '1️⃣ Head to <#1504793152131829850> and verify your account\n' +
-          '2️⃣ Visit **[manifesthubs.netlify.app](https://manifesthubs.netlify.app)** and log in\n' +
-          '3️⃣ Download manifests, Lua scripts and more!\n\n' +
           '> Need help? Open a ticket in our support channel.'
         )
         .setThumbnail(avatarUrl)
-        .setImage('https://cdn.cloudflare.steamstatic.com/store/home/store_home_share.jpg')
+        .setImage('https://manifesthubs.netlify.app/logo.jpg')
         .addFields(
           { name: '👤 Member', value: `${member}`, inline: true },
           { name: '🪪 Account', value: `<t:${Math.floor(member.user.createdTimestamp / 1000)}:D>`, inline: true },
@@ -273,14 +269,10 @@ client.on('interactionCreate', async (interaction) => {
             .setTitle('🎉  Welcome to Manifest Hub!')
             .setDescription(
               `Hey ${member}, glad to have you here!\n\n` +
-              '**To get started:**\n' +
-              '1️⃣ Head to <#1504793152131829850> and verify your account\n' +
-              '2️⃣ Visit **[manifesthubs.netlify.app](https://manifesthubs.netlify.app)** and log in\n' +
-              '3️⃣ Download manifests, Lua scripts and more!\n\n' +
               '> Need help? Open a ticket in our support channel.'
             )
             .setThumbnail(avatarUrl)
-            .setImage('https://cdn.cloudflare.steamstatic.com/store/home/store_home_share.jpg')
+            .setImage('https://manifesthubs.netlify.app/logo.jpg')
             .addFields(
               { name: '👤 Member',  value: `${member}`,                                              inline: true },
               { name: '🪪 Account', value: `<t:${Math.floor(member.user.createdTimestamp / 1000)}:D>`, inline: true },
