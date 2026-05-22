@@ -139,35 +139,6 @@ client.on('guildMemberAdd', async (member) => {
   } catch (err) {
     console.error('❌ Failed to send welcome message:', err.message);
   }
-
-  // ── DM the new member ───────────────────
-  try {
-    const dmEmbed = new EmbedBuilder()
-      .setColor(0x5865f2)
-      .setTitle('👋  Welcome to Manifest Hub!')
-      .setDescription(
-        `Hey **${member.user.username}**, thanks for joining **Manifest Hub**!\n\n` +
-        '**Here\'s how to get started:**\n' +
-        '1️⃣ Visit our website below and log in with Discord\n' +
-        '2️⃣ You\'ll get verified automatically ✅\n' +
-        '3️⃣ Download Steam manifests, Lua scripts and more!\n\n' +
-        '> 🔒 Need help? Open a support ticket in the server.'
-      )
-      .addFields(
-        { name: '🌐 Website', value: '[manifesthubs.netlify.app](https://manifesthubs.netlify.app)', inline: true },
-        { name: '💬 Discord', value: '[Join here](https://discord.gg/KUDhw8zYh)', inline: true },
-      )
-      .setThumbnail(guild.iconURL({ dynamic: true }))
-      .setFooter({ text: 'Manifest Hub • Automated Welcome Message' })
-      .setTimestamp();
-
-    const dmChannel = await member.user.createDM();
-    await dmChannel.send({ embeds: [dmEmbed] });
-    console.log(`📨 DM sent to ${member.user.tag}`);
-  } catch (err) {
-    // User may have DMs disabled — that's fine
-    console.warn(`⚠️ Could not DM ${member.user.tag}: ${err.message}`);
-  }
 });
 
 // ══════════════════════════════════════════════════════════
@@ -257,7 +228,6 @@ client.on('interactionCreate', async (interaction) => {
       const memberCount = guild.memberCount;
 
       let channelOk = false;
-      let dmOk      = false;
 
       // ── Send to welcome channel ────────────────────────
       try {
@@ -288,39 +258,10 @@ client.on('interactionCreate', async (interaction) => {
         console.error('❌ /testwelcome channel send failed:', err.message);
       }
 
-      // ── Send DM ────────────────────────────────────────
-      try {
-        const dmEmbed = new EmbedBuilder()
-          .setColor(0x5865f2)
-          .setTitle('👋  Welcome to Manifest Hub!')
-          .setDescription(
-            `Hey **${member.user.username}**, thanks for joining **Manifest Hub**!\n\n` +
-            '**Here\'s how to get started:**\n' +
-            '1️⃣ Visit our website below and log in with Discord\n' +
-            '2️⃣ You\'ll get verified automatically ✅\n' +
-            '3️⃣ Download Steam manifests, Lua scripts and more!\n\n' +
-            '> 🔒 Need help? Open a support ticket in the server.'
-          )
-          .addFields(
-            { name: '🌐 Website', value: '[manifesthubs.netlify.app](https://manifesthubs.netlify.app)', inline: true },
-            { name: '💬 Discord', value: '[Join here](https://discord.gg/KUDhw8zYh)',               inline: true },
-          )
-          .setThumbnail(guild.iconURL({ dynamic: true }))
-          .setFooter({ text: '🧪 TEST — Manifest Hub • Automated Welcome Message' })
-          .setTimestamp();
-
-        const dmChannel = await interaction.user.createDM();
-        await dmChannel.send({ embeds: [dmEmbed] });
-        dmOk = true;
-      } catch (err) {
-        console.warn(`⚠️ /testwelcome DM failed: ${err.message}`);
-      }
-
       await interaction.editReply({
         content:
           `🧪 **Welcome test complete!**\n` +
-          `📢 Channel message: ${channelOk ? '✅ Sent to <#' + WELCOME_CHANNEL_ID + '>' : '❌ Failed'}\n` +
-          `📨 DM: ${dmOk ? '✅ Sent to your DMs' : '❌ Failed (DMs may be disabled)'}`,
+          `📢 Channel message: ${channelOk ? '✅ Sent to <#' + WELCOME_CHANNEL_ID + '>' : '❌ Failed'}`,
       });
     }
 
