@@ -320,13 +320,26 @@ client.on('interactionCreate', async (interaction) => {
           });
         }
 
-        const ticketChannel = await guild.channels.create({
-          name: `ticket-${safeName}`,
-          type: ChannelType.GuildText,
-          parent: TICKET_CATEGORY_ID || null,
-          permissionOverwrites,
-          topic: `Support ticket for ${member.user.tag} (${member.id}) — opened <t:${Math.floor(Date.now()/1000)}:R>`,
-        });
+        // Try to create the channel inside the category first;
+        // if it fails (bad category ID / missing perms) fall back to no category.
+        let ticketChannel;
+        try {
+          ticketChannel = await guild.channels.create({
+            name: `ticket-${safeName}`,
+            type: ChannelType.GuildText,
+            parent: TICKET_CATEGORY_ID || null,
+            permissionOverwrites,
+            topic: `Support ticket for ${member.user.tag} (${member.id}) — opened <t:${Math.floor(Date.now()/1000)}:R>`,
+          });
+        } catch (createErr) {
+          console.warn(`⚠️ Could not create ticket in category (${createErr.code} ${createErr.message}). Retrying without category...`);
+          ticketChannel = await guild.channels.create({
+            name: `ticket-${safeName}`,
+            type: ChannelType.GuildText,
+            permissionOverwrites,
+            topic: `Support ticket for ${member.user.tag} (${member.id}) — opened <t:${Math.floor(Date.now()/1000)}:R>`,
+          });
+        }
 
         openTickets.set(member.id, ticketChannel.id);
 
@@ -364,9 +377,9 @@ client.on('interactionCreate', async (interaction) => {
 
         console.log(`🎫 Ticket opened by ${member.user.tag} → #${ticketChannel.name}`);
       } catch (err) {
-        console.error('❌ Failed to create ticket channel:', err);
+        console.error('❌ Failed to create ticket channel:', err.code, err.message, err);
         await interaction.editReply({
-          content: '❌ Failed to create your ticket. Please contact an admin.',
+          content: `❌ Failed to create your ticket. Error: \`${err.code || err.message}\` — please contact an admin.`,
         });
       }
     }
