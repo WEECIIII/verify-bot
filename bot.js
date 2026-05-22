@@ -24,7 +24,8 @@ const MEMBER_ROLE_ID  = '1504793152131829850';
 // │  SUPPORT_ROLE_ID    : role that can see all tickets     │
 // │  TICKET_LOG_CHANNEL : channel to log closed tickets     │
 // └─────────────────────────────────────────────────────────┘
-const TICKET_CATEGORY_ID  = process.env.TICKET_CATEGORY_ID  || '1507332505458573403';
+// Category ID left empty — provide a valid Category channel ID to group tickets
+const TICKET_CATEGORY_ID  = process.env.TICKET_CATEGORY_ID  || '';
 const SUPPORT_ROLE_ID     = process.env.SUPPORT_ROLE_ID     || '1507332056642879538';
 const TICKET_LOG_CHANNEL  = process.env.TICKET_LOG_CHANNEL  || '1507332152465821706';
 
@@ -320,8 +321,7 @@ client.on('interactionCreate', async (interaction) => {
           });
         }
 
-        // Try to create the channel inside the category first;
-        // if it fails (bad category ID / missing perms) fall back to no category.
+        // Create ticket channel (no category for now — set TICKET_CATEGORY_ID env var with a valid Category ID to group tickets)
         let ticketChannel;
         try {
           ticketChannel = await guild.channels.create({
@@ -332,7 +332,7 @@ client.on('interactionCreate', async (interaction) => {
             topic: `Support ticket for ${member.user.tag} (${member.id}) — opened <t:${Math.floor(Date.now()/1000)}:R>`,
           });
         } catch (createErr) {
-          console.warn(`⚠️ Could not create ticket in category (${createErr.code} ${createErr.message}). Retrying without category...`);
+          console.warn(`⚠️ Could not create ticket with category (${createErr.code}: ${createErr.message}). Retrying without category...`);
           ticketChannel = await guild.channels.create({
             name: `ticket-${safeName}`,
             type: ChannelType.GuildText,
